@@ -4,7 +4,7 @@ nv-bluetooth
 Overview
 --------
 
-Bluetooth utility library, mainly for Android.
+Bluetooth utility library, mainly for Android (adopted for standard Java).
 
 The main purpose of this library is to provide a parser for the payload
 part of BLE advertising packets. According to the specification, the
