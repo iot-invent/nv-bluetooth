@@ -31,7 +31,7 @@ public class ADPayloadParser {
 	private final Map<Integer, List<ADStructureBuilder>> mBuilders;
 	private final Map<Integer, List<ADManufacturerSpecificBuilder>> mMSBuilders;
 
-	private ADPayloadParser() {
+	protected ADPayloadParser() {
 		// Builders for Manufacturer Specific Data.
 		mMSBuilders = new HashMap<Integer, List<ADManufacturerSpecificBuilder>>();
 		registerManufacturerSpecificBuilder(0x004C, new MS004CBuilder());
