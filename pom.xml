@@ -1,38 +1,37 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.rtlscloud</groupId>
-    <artifactId>nv-bluetooth</artifactId>
-    <version>1.9-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>${project.groupId}:${project.artifactId}</name>
-    <description>
+	<groupId>io.rtlscloud</groupId>
+	<artifactId>nv-bluetooth</artifactId>
+	<version>1.9-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>
         Bluetooth utility library, adopted for standard Java.
     </description>
-    <url>https://github.com/TakahikoKawasaki/nv-bluetooth</url>
+	<organization>
+		<name>IoT Invent GmbH</name>
+	</organization>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
-    <developers>
-        <developer>
-            <name>Takahiko Kawasaki</name>
-        </developer>
-    </developers>
+	<scm>
+		<connection>scm:git:https://github.com/iot-invent/nv-bluetooth.git</connection>
+		<developerConnection>scm:git:https://github.com/iot-invent/nv-bluetooth.git</developerConnection>
+		<url>https://github.com/iot-invent/nv-bluetooth.git</url>
+		<tag>HEAD</tag>
+	</scm>
 
-    <scm>
-        <connection>scm:git:git@github.com:TakahikoKawasaki/nv-bluetooth.git</connection>
-        <developerConnection>scm:git:git@github.com:TakahikoKawasaki/nv-bluetooth.git</developerConnection>
-        <url>git@github.com:TakahikoKawasaki/nv-bluetooth.git</url>
-      <tag>HEAD</tag>
-    </scm>
-
-    <properties>
+	<properties>
+		<project.scm.id>github</project.scm.id>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,18 +39,33 @@
 	</properties>
 
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<inherited>true</inherited>
+				<configuration>
+					<doclint>none</doclint>
+					<additionalparam>-Xdoclint:none</additionalparam>
+					<failOnError>false</failOnError>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
 	<distributionManagement>
 		<repository>
-			<id>internal</id>
+			<id>nexus</id>
 			<name>Release Repository</name>
 			<url>${repo.releases}</url>
 		</repository>
