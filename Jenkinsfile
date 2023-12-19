@@ -12,16 +12,16 @@ pipeline {
         timestamps()
         disableConcurrentBuilds()
 		// Keep only the last 7 builds
-    	buildDiscarder(logRotator(numToKeepStr: '7', artifactNumToKeepStr: '7'))
+    	buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
         skipStagesAfterUnstable()
 	}
 	parameters {
         booleanParam(name: "CLEANUP",
                 description: "Cleanup Current Workspace.",
                 defaultValue: false)
-        booleanParam(name: "RELEASE",
-                description: "Build a release from current commit.",
-                defaultValue: false)
+//        booleanParam(name: "RELEASE",
+//                description: "Build a release from current commit.",
+//                defaultValue: false)
         string(name: "MVN_PARAMS", defaultValue: "", description: "Aditional Maven Parameters for: mvn clean install deploy")
     }
     stages {
@@ -34,47 +34,40 @@ pipeline {
             	checkout scm
             }
         }
-        stage('Build') {
-            steps {
-				withMaven(maven: 'M3', mavenSettingsConfig: 'iot_maven') {
-					sh "mvn ${params.MVN_PARAMS} -B -DskipTests clean package"
-    			} 
-			}
-        }
-        stage('Test') {
-            steps {
-				withMaven(maven: 'M3', mavenSettingsConfig: 'iot_maven') {
-					sh "mvn ${params.MVN_PARAMS} test"
-    			} 
-			}
-//			post {
-//                always {
-//                    junit 'target/surefire-reports/*.xml' 
-//                }
-//            }
-        }
-        stage('Deploy') {
-            steps {
-				withMaven(maven: 'M3', mavenSettingsConfig: 'iot_maven') {
-					sh "mvn ${params.MVN_PARAMS} deploy"
-    			} 
-			}
-        }
-        stage("Release") {
+        stage('Build & Deploy') {
             when {
-                expression { params.RELEASE }
-            }
+       			not { branch 'master' }
+      		}
             steps {
 				withMaven(maven: 'M3', mavenSettingsConfig: 'iot_maven') {
-					sh """
+					sh "mvn ${params.MVN_PARAMS} -e -B clean deploy -Pproduction"
+   				}
+  			}
+        }
+ 		stage("Release") {
+            when { branch 'master' }
+            environment {
+        		RELEASE_VERSION = getNextRelease()
+     		}
+            steps {
+				echo "Releasing ${RELEASE_VERSION}"
+				withMaven(maven: 'M3', mavenSettingsConfig: 'iot_maven') {
+				
+					sh "mvn -B clean -Pproduction -Drevision=${RELEASE_VERSION} -Dchangelist="
+					sh "mvn -B enforcer:enforce -Pproduction -Drevision=${RELEASE_VERSION} -Dchangelist="
+					sh "mvn -B deploy -Pproduction -Drevision=${RELEASE_VERSION} -Dchangelist="
+    			}
+    			withCredentials([gitUsernamePassword(credentialsId: 'iot-invent-bot',
+                 	gitToolName: 'Default')]) {
+                	sh """
        				git config --global user.email support@iot-invent.com
        				git config --global user.name iot-invent-bot
        				"""
-					sh "mvn ${params.MVN_PARAMS} -B -Dresume=false release:prepare release:perform"
-    			} 
+       				sh "git tag v${RELEASE_VERSION}"
+					sh "git push origin v${RELEASE_VERSION}"
+                } 
             }
         }
- 
     }
  	
  	post {
