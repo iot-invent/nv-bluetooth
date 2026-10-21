@@ -40,7 +40,9 @@ pipeline {
       		}
             steps {
 				withMaven(maven: 'M3', mavenSettingsConfig: 'iot_maven') {
-					sh "mvn ${params.MVN_PARAMS} -e -B clean deploy -Pproduction"
+					withEnv(["MVN_PARAMS=${mvnParams()}"]) {
+						sh "mvn \$MVN_PARAMS -e -B clean deploy -Pproduction"
+					}
    				}
   			}
         }
@@ -75,4 +77,16 @@ pipeline {
       		sendNotifications currentBuild.result
     	}
     }
+}
+
+/**
+ * MVN_PARAMS, checked: Maven options only, nothing the shell would read as a command of its own (RM-182).
+ * It reaches the shell through the environment, not by Groovy interpolation.
+ */
+String mvnParams() {
+    String value = (params.MVN_PARAMS ?: '').trim()
+    if (!(value ==~ /[A-Za-z0-9=._:,\/@+\- ]*/)) {
+        error "MVN_PARAMS may only hold Maven options (letters, digits, = . _ : , / @ + - and spaces), not '${value}'"
+    }
+    return value
 }
